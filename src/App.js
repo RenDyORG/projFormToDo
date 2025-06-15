@@ -1,25 +1,45 @@
-import logo from './logo.svg';
+import { useState } from "react";
+import Input from "./Components/Input";
+import Output from "./Components/Output";
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [data, setData] = useState([]);
+
+    const parseDate = (dateStr) => {
+        const [day, month, year] = dateStr.split('.').map(Number);
+        return new Date(year, month - 1, day);
+    };
+
+    const addTo = (newDate, newKm) => {
+        const kmNum = parseFloat(newKm);
+        if (isNaN(kmNum)) return;
+
+        setData(prevData => {
+            const existingIndex = prevData.findIndex(entry => entry.date === newDate);
+
+            if (existingIndex !== -1) {
+                const updated = [...prevData];
+                updated[existingIndex].km = (parseFloat(updated[existingIndex].km) + kmNum).toFixed(1);
+                return updated.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+            } else {
+                const newEntry = { date: newDate, km: kmNum.toFixed(1) };
+                return [...prevData, newEntry].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+            }
+        });
+    };
+
+    const deleteTo = (index) => {
+        const updated = data.filter((_, i) => i !== index);
+        setData(updated);
+    };
+
+    return (
+        <div className="App">
+            <Input addText={addTo} />
+            <Output data={data} onDelete={deleteTo} />
+        </div>
+    );
 }
 
 export default App;
