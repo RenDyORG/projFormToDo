@@ -19,8 +19,11 @@ function App() {
             const existingIndex = prevData.findIndex(entry => entry.date === newDate);
 
             if (existingIndex !== -1) {
-                const updated = [...prevData];
-                updated[existingIndex].km = (parseFloat(updated[existingIndex].km) + kmNum).toFixed(1);
+                const updated = prevData.map((item, index) =>
+                    index === existingIndex
+                        ? { ...item, km: (parseFloat(item.km) + kmNum).toFixed(1) } // Создаём новый объект!
+                        : item
+                );
                 return updated.sort((a, b) => parseDate(b.date) - parseDate(a.date));
             } else {
                 const newEntry = { date: newDate, km: kmNum.toFixed(1) };
